@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="static/css/index.css">
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/static/layui/css/layui.css">
     <script src="${pageContext.request.contextPath}/static/layui/layui.js" type="text/javascript" charset="UTF-8"></script>
+    <script src="${pageContext.request.contextPath}/static/js/jquery-3.6.0.js" type="text/javascript" charset="UTF-8"></script>
     <title>登录界面</title>
     <script>
         if (window != top) {
@@ -22,15 +23,15 @@
         }
     </script>
 </head>
-<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<%--<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>--%>
 <body>
 <div class="box">
     <div class="left"></div>
     <div class="right">
         <h4>登 录</h4>
-        <form name="loginForm" action="${pageContext.request.contextPath }/login.do" method="post">
-            <input class="acc" name="id" type="text" placeholder="用户名">
-            <input class="acc" name="pwd" type="password" placeholder="密码">
+        <form name="loginForm" method="post">
+            <input class="acc" name="id" id="id" type="text" placeholder="用户名">
+            <input class="acc" name="pwd" id="pwd" type="password" placeholder="密码">
             <input type="text" value="" placeholder="请输入验证码（不区分大小写）" class="acc2">
             &nbsp;&nbsp;
             <canvas id="canvas" width="100" height="43"></canvas>
@@ -95,7 +96,30 @@
                 draw(show_num);
                 return;
             }
-            loginForm.submit();
+            $.post({
+                url:"${pageContext.request.contextPath}/login.do",
+                data:{"pwd":$("#pwd").val(),"id":$("#id").val()},
+                success:function(data) {
+                    var msg = JSON.parse(data).msg;
+                    if (msg === 'ok') {//信息核对成功
+                        layer.alert('登陆成功~!', {
+                            skin: 'layui-layer-molv' //样式类名
+                            ,closeBtn: 0
+                        }, function(){
+                            var index = layer.load(0, {shade: false}); //0代表加载的风格，支持0-2
+                            window.location.href="${pageContext.request.contextPath}/jsp/theme.jsp";
+                        });
+                    } else {
+                        layer.alert('用户名或密码错误！', {
+                            icon: 5,
+                            title: "提示"
+                        });
+                        $(".acc2").val('');
+                        draw(show_num);
+                        return;
+                    }
+                }
+            })
         })
     })
     function draw(show_num) {

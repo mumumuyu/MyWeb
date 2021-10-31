@@ -4,6 +4,7 @@ import com.lgd.pojo.User;
 import com.lgd.service.user.UserService;
 import com.lgd.service.user.UserServiceImpl;
 import com.lgd.utils.Constants;
+import org.json.JSONObject;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -27,6 +28,7 @@ public class LoginServlet extends HttpServlet{
 		// TODO 自动生成的方法存根
 		System.out.println("login ============ " );
 
+		String msg = null;
 		//获取用户名和密码
 		String id = req.getParameter("id");
 		String pwd = req.getParameter("pwd");
@@ -37,13 +39,15 @@ public class LoginServlet extends HttpServlet{
 		if(null != user){
 			//登录成功
 			System.out.println("succeed ============ " );
-			//放入session
 			req.getSession().setAttribute(Constants.USER_SESSION,user);
-			out.print("<script>alert('succeed!');window.location.href='"+getServletContext().getContextPath()+"/jsp/theme.jsp'</script>");
+			msg="ok";
 		}else {
 			System.out.println("登录失败 ============ ");
-			//页面跳转（login.jsp）带出提示信息--转发
-			out.print("<script>alert('The username or password is wrong!!');window.location.href='"+getServletContext().getContextPath()+"/login.jsp'</script>");
+			msg="no";
 		}
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("msg", msg);
+		resp.setCharacterEncoding("utf-8");
+		resp.getWriter().write(jsonObject.toString());
 	}
 }
